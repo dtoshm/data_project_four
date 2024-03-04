@@ -44,10 +44,29 @@ def make_date(date_str):
     year = int(split_date[2])
     return_date = datetime.date(year, month, day)
     return return_date      
-   
+
+
+def menu():
+    print("Welcome")
+    while True:
+        user_input = input("V: View product details \nN:Add New Product \nA:View Analysis \nB:Backup Database \nE:Exit \n:").lower()
+        if user_input == "v":
+            print("View Details")
+        elif user_input == "n":
+            print("Add New Product")
+        elif user_input == "a":
+            print("View Anaylsis")
+        elif user_input == "b":
+            print("Backup Database")
+        elif user_input == "e":
+            print("Exit Program")
+            break
+        else:
+            print("\nPlease enter a valid menu option\n")
+
     
 if __name__ == '__main__':
     models.Base.metadata.create_all(models.engine)
     import_brands_csv()
     import_inventory_csv()
-    
+    menu()
