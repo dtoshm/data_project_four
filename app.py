@@ -21,7 +21,7 @@ def import_inventory_csv():
         for row in data:
             product_name = row[0]
             product_price = row[1]
-            product_quantity = row[2]
+            product_quantity = int(row[2])
             date_updated = make_date(row[3])
             brand_name = row[4]
             
