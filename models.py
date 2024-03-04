@@ -26,7 +26,7 @@ class Product(Base):
     product_quantity = Column(Integer)
     product_price = Column(Integer)
     product_updated = Column(Date)
-    brand_id = relationship("Brand", back_popualates="brand_id",
+    brand_id = relationship("Brand", back_populates="brand_id",
                                     cascade="all, delete, delete-orphan")
     
     def __repr__(self):
