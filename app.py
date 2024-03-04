@@ -27,3 +27,4 @@ def import_inventory_csv():
     
 if __name__ == '__main__':
     models.Base.metadata.create_all(models.engine)
+    import_brands_csv()
