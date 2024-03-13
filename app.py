@@ -46,12 +46,28 @@ def make_date(date_str):
     return return_date      
 
 
+def get_product_by_id():
+    while True:
+        user_selected_product = input("\nEnter a Product ID \n:")
+        product = models.session.query(models.Product).filter(models.Product.product_id==user_selected_product).first()
+        if product == None:
+            print("The product id you have entered has no matching id in the database. Please try again. \n:")
+        else:
+            print(f'''\nProduct ID: {product.product_id}
+                  \rProduct Name: {product.product_name}
+                  \rProduct Quantity: {product.product_quantity}
+                  \rProduct Price: {product.product_price}
+                  \rProduct Updated: {product.product_updated}
+                  \rBrand ID: {product.brand_id}\n''')
+            break
+
+
 def menu():
-    print("Welcome")
+    print("Welcome\n")
     while True:
         user_input = input("V: View product details \nN:Add New Product \nA:View Analysis \nB:Backup Database \nE:Exit \n:").lower()
         if user_input == "v":
-            print("View Details")
+            get_product_by_id()
         elif user_input == "n":
             print("Add New Product")
         elif user_input == "a":
