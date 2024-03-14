@@ -44,6 +44,41 @@ def import_inventory_csv():
             session.commit()
       
 
+def backup_products_to_csv():
+    products = session.query(Product).all()
+    if not products:
+        print("No products to export.")
+        return
+    csv_file_path = 'inventory_backup.csv'
+    with open(csv_file_path, 'w', newline='') as csvfile:
+        csv_writer = csv.writer(csvfile)
+        csv_writer.writerow(['product_name', 'product_price', 'product_quantity', 'date_updated', 'brand_name'])
+        for product in products:
+            date_str = str(product.product_updated).split('-')
+            formatted_date = f'{date_str[1]}/{date_str[2]}/{date_str[0]}'
+            csv_writer.writerow([product.product_name, 
+                                 str(f'${product.product_price / 100}'), 
+                                 str(product.product_quantity), 
+                                 formatted_date,
+                                 product.brand_id
+                                ])
+    print(f"\nData Exported To: {csv_file_path}")
+
+
+def backup_brands_to_csv():
+    brands = session.query(Brand).all()
+    if not brands:
+        print("No brands to export.")
+        return
+    csv_file_path = 'brands_backup.csv'
+    with open(csv_file_path, 'w', newline='') as csvfile:
+        csv_writer = csv.writer(csvfile)
+        csv_writer.writerow(['brand_name'])
+        for brand in brands:
+            csv_writer.writerow([brand.brand_name])
+    print(f"Data Exported To: {csv_file_path}\n")
+
+
 def clean_price(price_str):
     try:
         cleaned_price = float(price_str.replace('$', ''))
@@ -162,7 +197,8 @@ def menu():
         elif user_input == "a":
             analysis()
         elif user_input == "b":
-            print("Backup Database")
+            backup_products_to_csv()
+            backup_brands_to_csv()
         elif user_input == "e":
             print("Exit Program")
             break
