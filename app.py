@@ -1,4 +1,5 @@
-import models
+from models import (Base, session, Brand, 
+                    Product, engine, desc, asc, func)
 import datetime
 import csv
 
@@ -9,9 +10,9 @@ def import_brands_csv():
         next(data)
         for row in data:
             brand_name = row[0]
-            new_brand = models.Brand(brand_name=brand_name)
-            models.session.add(new_brand)
-            models.session.commit()
+            new_brand = Brand(brand_name=brand_name)
+            session.add(new_brand)
+            session.commit()
     
     
 def import_inventory_csv():
@@ -27,14 +28,14 @@ def import_inventory_csv():
             
             cleaned_product_price = float(product_price.replace('$', ''))
             price_in_cents = int(cleaned_product_price * 100)
-            brand_query = models.session.query(models.Brand).filter(models.Brand.brand_name==brand_name).first().brand_id
+            brand_query = session.query(Brand).filter(Brand.brand_name==brand_name).first().brand_id
             
-            new_product = models.Product(product_name=product_name, product_price=price_in_cents, 
+            new_product = Product(product_name=product_name, product_price=price_in_cents, 
                                          product_quantity=product_quantity, product_updated=date_updated,
                                          brand_id = brand_query)
             
-            models.session.add(new_product)
-            models.session.commit()
+            session.add(new_product)
+            session.commit()
       
 
 def clean_price(price_str):
@@ -72,25 +73,25 @@ def clean_date(date_str):
 
 
 def add_product(new_product):
-    existing_product = models.session.query(models.Product).filter(models.Product.product_name==new_product.product_name).first()
+    existing_product = session.query(Product).filter(Product.product_name==new_product.product_name).first()
     if existing_product:
         if existing_product.product_updated < new_product.product_updated:
             existing_product.product_name = new_product.product_name
             existing_product.product_price = new_product.product_price
             existing_product.product_quantity = new_product.product_quantity
             existing_product.product_updated = new_product.product_updated
-            models.session.commit()
+            session.commit()
             print("\nProduct Updated\n")
     else:
-        models.session.add(new_product)
-        models.session.commit()
+        session.add(new_product)
+        session.commit()
         print("\nProduct Added\n")
 
 
 def get_product_by_id():
     while True:
         user_selected_product = input("\nEnter a Product ID \n:")
-        product = models.session.query(models.Product).filter(models.Product.product_id==user_selected_product).first()
+        product = session.query(Product).filter(Product.product_id==user_selected_product).first()
         if product == None:
             print("The product id you have entered has no matching id in the database. Please try again. \n:")
         else:
@@ -124,7 +125,7 @@ def user_entered_product():
         if type(date) == datetime.date:
             date_error = False
     brand_id = input("Brand ID:")
-    new_product = models.Product(product_name=product_name,
+    new_product = Product(product_name=product_name,
                         product_price=price,
                         product_quantity=quantity,
                         product_updated=date,
@@ -134,11 +135,10 @@ def user_entered_product():
 
 def analysis():
     print("Analysis")
-    most_expensive_product = models.session.query(models.Product).order_by(models.desc(models.Product.product_price)).first()
-    if most_expensive_product:
-        print(f"The most expensive product is: {most_expensive_product.product_name} - ${most_expensive_product.product_price/100}")
-    else:
-        print("No products found.")
+    most_expensive_product = session.query(Product).order_by(desc(Product.product_price)).first()
+    least_expensive_product = session.query(Product).order_by(asc(Product.product_price)).first()
+    print(f"The most expensive product is: {most_expensive_product.product_name} - ${most_expensive_product.product_price/100}")
+    print(f"The least expensive product is: {least_expensive_product.product_name} - ${least_expensive_product.product_price/100}")
 
 
 def menu():
@@ -162,7 +162,7 @@ def menu():
 
     
 if __name__ == '__main__':
-    models.Base.metadata.create_all(models.engine)
+    Base.metadata.create_all(engine)
     import_brands_csv()
     import_inventory_csv()
     # menu()
