@@ -4,6 +4,12 @@ import datetime
 import csv
 
 
+def check_for_database():
+    if session.query(Brand).count() == 0 and session.query(Product).count() == 0:
+        import_brands_csv()
+        import_inventory_csv()
+
+
 def import_brands_csv():
     with open('brands.csv') as csvfile:
         data=csv.reader(csvfile)
@@ -72,6 +78,35 @@ def clean_date(date_str):
         return return_date
 
 
+def user_entered_product():
+    product_name = input("\nProduct Name: ")
+    price_error = True
+    while price_error:
+        price = input("Product Price: ")
+        price = clean_price(price)
+        if type(price) == int:
+            price_error = False
+    quantity_error = True
+    while quantity_error:
+        quantity = input("Product Quantity: ")
+        quantity = clean_quantity(quantity)
+        if type(quantity) == int:
+            quantity_error = False
+    date_error = True
+    while date_error:
+        date = input("Product Date Updated (ex 04/08/2021): ")
+        date = clean_date(date)
+        if type(date) == datetime.date:
+            date_error = False
+    brand_id = input("Brand ID:")
+    new_product = Product(product_name=product_name,
+                        product_price=price,
+                        product_quantity=quantity,
+                        product_updated=date,
+                        brand_id=brand_id)
+    return new_product
+
+
 def add_product(new_product):
     existing_product = session.query(Product).filter(Product.product_name==new_product.product_name).first()
     if existing_product:
@@ -104,44 +139,18 @@ def get_product_by_id():
             break
 
 
-def user_entered_product():
-    product_name = input("\nProduct Name: ")
-    price_error = True
-    while price_error:
-        price = input("Product Price: ")
-        price = clean_price(price)
-        if type(price) == int:
-            price_error = False
-    quantity_error = True
-    while quantity_error:
-        quantity = input("Product Quantity: ")
-        quantity = clean_quantity(quantity)
-        if type(quantity) == int:
-            quantity_error = False
-    date_error = True
-    while date_error:
-        date = input("Product Date Updated (ex 04/08/2021): ")
-        date = clean_date(date)
-        if type(date) == datetime.date:
-            date_error = False
-    brand_id = input("Brand ID:")
-    new_product = Product(product_name=product_name,
-                        product_price=price,
-                        product_quantity=quantity,
-                        product_updated=date,
-                        brand_id=brand_id)
-    return new_product
-
-
 def analysis():
-    print("Analysis")
+    print("\nAnalysis")
     most_expensive_product = session.query(Product).order_by(desc(Product.product_price)).first()
-    least_expensive_product = session.query(Product).order_by(asc(Product.product_price)).first()
     print(f"The most expensive product is: {most_expensive_product.product_name} - ${most_expensive_product.product_price/100}")
+    least_expensive_product = session.query(Product).order_by(asc(Product.product_price)).first()
     print(f"The least expensive product is: {least_expensive_product.product_name} - ${least_expensive_product.product_price/100}")
+    brand_most_products = session.query(Brand.brand_name, func.count(Product.product_id)).join(Product).group_by(Brand.brand_id).order_by(func.count(Product.product_id).desc()).first()
+    print(f"The brand with the most products is: {brand_most_products[0]} - {brand_most_products[1]} products\n")
 
 
 def menu():
+    check_for_database()
     print("Welcome\n")
     while True:
         user_input = input("V: View product details \nN:Add New Product \nA:View Analysis \nB:Backup Database \nE:Exit \n:").lower()
@@ -151,7 +160,7 @@ def menu():
             new_product = user_entered_product()
             add_product(new_product) 
         elif user_input == "a":
-            print("View Anaylsis")
+            analysis()
         elif user_input == "b":
             print("Backup Database")
         elif user_input == "e":
@@ -163,7 +172,4 @@ def menu():
     
 if __name__ == '__main__':
     Base.metadata.create_all(engine)
-    import_brands_csv()
-    import_inventory_csv()
-    # menu()
-    analysis()
+    menu()
