@@ -132,6 +132,15 @@ def user_entered_product():
     return new_product
 
 
+def analysis():
+    print("Analysis")
+    most_expensive_product = models.session.query(models.Product).order_by(models.desc(models.Product.product_price)).first()
+    if most_expensive_product:
+        print(f"The most expensive product is: {most_expensive_product.product_name} - ${most_expensive_product.product_price/100}")
+    else:
+        print("No products found.")
+
+
 def menu():
     print("Welcome\n")
     while True:
@@ -156,4 +165,5 @@ if __name__ == '__main__':
     models.Base.metadata.create_all(models.engine)
     import_brands_csv()
     import_inventory_csv()
-    menu()
+    # menu()
+    analysis()
