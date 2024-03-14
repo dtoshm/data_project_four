@@ -65,20 +65,6 @@ def backup_products_to_csv():
     print(f"\nData Exported To: {csv_file_path}")
 
 
-def backup_brands_to_csv():
-    brands = session.query(Brand).all()
-    if not brands:
-        print("No brands to export.")
-        return
-    csv_file_path = 'brands_backup.csv'
-    with open(csv_file_path, 'w', newline='') as csvfile:
-        csv_writer = csv.writer(csvfile)
-        csv_writer.writerow(['brand_name'])
-        for brand in brands:
-            csv_writer.writerow([brand.brand_name])
-    print(f"Data Exported To: {csv_file_path}\n")
-
-
 def clean_price(price_str):
     try:
         cleaned_price = float(price_str.replace('$', ''))
@@ -198,7 +184,6 @@ def menu():
             analysis()
         elif user_input == "b":
             backup_products_to_csv()
-            backup_brands_to_csv()
         elif user_input == "e":
             print("Exit Program")
             break
