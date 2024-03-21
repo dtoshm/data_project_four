@@ -53,13 +53,18 @@ def import_inventory_csv():
             
             cleaned_product_price = float(product_price.replace('$', ''))
             price_in_cents = int(cleaned_product_price * 100)
+            
+            # Query the database to get the brand_id
             brand_query = session.query(Brand).filter(Brand.brand_name==brand_name).first().brand_id
-            
-            new_product = Product(product_name=product_name, product_price=price_in_cents, 
-                                         product_quantity=product_quantity, product_updated=date_updated,
-                                         brand_id = brand_query)
-            
-            add_product(new_product)
+            if brand_query:
+                new_product = Product(product_name=product_name, 
+                                      product_price=price_in_cents,
+                                      product_quantity=product_quantity, 
+                                      product_updated=date_updated,
+                                      brand_id = brand_query) 
+                add_product(new_product)
+            else:
+                print(f"Brand {brand_query} has not been found in the database.")
 
 
 def backup_products_to_csv():
