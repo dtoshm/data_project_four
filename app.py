@@ -303,7 +303,7 @@ def menu():
     # Precaution
     try:
         while True:
-            user_input = input("\nV: View Product \nN: Add Product \nA: Display Analysis \nB: Backup Database \nX: Exit \n:").lower()    
+            user_input = input("\nV: View a single product's inventory \nN: Add a new product to the database \nA: View an analysis \nB: Make a backup of the entire inventory \nX: Exit \n:").lower()    
             # Menu
             if user_input == "v":
                 # View Product
