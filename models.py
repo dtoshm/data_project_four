@@ -34,7 +34,7 @@ class Product(Base):
         return f'''product_id: {self.product_id},
                    \rproduct_name: {self.product_name},
                    \rproduct_quantity: {self.product_quantity},
-                   \rproduct_price: {self.product_price},
+                   \rproduct_price: ${self.product_price/100},
                    \rproduct_updated: {str(self.product_updated).replace('-', '/')},
                    \rbrand_id: {self.brand_id},
                    \rbrand: {self.brand.brand_name}'''

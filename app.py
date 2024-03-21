@@ -198,7 +198,7 @@ def add_product(new_product):
     Adds a new product to the database or updates an existing product if a newer version is provided.
 
     :param new_product: Product object representing the new or updated product to be added or updated.
-    :return: str indicating if the product was added or updated ('added' or 'updated')
+    :return: str indicating if the product was added or updated ('Added' or 'Updated')
     """
     existing_product = session.query(Product).filter(Product.product_name==new_product.product_name).first()
     
@@ -210,12 +210,12 @@ def add_product(new_product):
             existing_product.product_quantity = new_product.product_quantity
             existing_product.product_updated = new_product.product_updated
             session.commit()
-            return "updated"
+            return "Updated"
     else:
         # Add new product to the database
         session.add(new_product)
         session.commit()
-        return "added"
+        return "Added"
 
 
 def delete_product(product_id):
@@ -311,8 +311,8 @@ def menu():
                 # submenu
                 if user_decision == "e":
                     new_product = create_product()
-                    status = add_product(new_product) 
-                    print(f"\nProduct {status}.")
+                    edit_status = add_product(new_product) 
+                    print(f"\nProduct {edit_status}.")
                 elif user_decision == "d":
                     delete_product(selected_product)
                     print("\nProduct Deleted")
@@ -323,7 +323,8 @@ def menu():
                     print("Please enter y or n")       
         elif user_input == "n":
             new_product = create_product()
-            add_product(new_product) 
+            new_status = add_product(new_product) 
+            print(f"\nProduct {new_status}.")
         elif user_input == "a":
             analysis()
         elif user_input == "b":
