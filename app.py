@@ -230,9 +230,17 @@ def delete_product(product_id):
 
 
 def get_product_by_id():
+    """
+    Retrieves and displays product details based on a user-provided Product ID.
+
+    Continues to prompt the user until a valid Product ID is entered.
+    
+    :return: String representing the user-entered Product ID.
+    """
     while True:
         user_product_id = input("\nEnter a Product ID \n:")
         product = session.query(Product).filter(Product.product_id==user_product_id).first()
+        
         if product == None:
             print("\nThe product id you entered has no matching id in the database. Please try again.")
         else:
@@ -243,53 +251,95 @@ def get_product_by_id():
                   \rProduct Updated: {product.product_updated}
                   \rBrand ID: {product.brand_id}
                   \rBrand: {product.brand.brand_name}\n''')
-            
             break
     return user_product_id
 
 
 def analysis():
+    """
+    Performs analysis on the products and brands in the database and prints relevant information.
+
+    Prints:
+    - The most expensive product and its price.
+    - The least expensive product and its price.
+    - The brand with the most products and the number of products.
+    - The product with the most quantity in the inventory.
+
+    :return: None
+    """
     print("\nAnalysis")
+    
+    # Find the most expensive product
     most_expensive_product = session.query(Product).order_by(desc(Product.product_price)).first()
     print(f"The most expensive product is: {most_expensive_product.product_name} - ${most_expensive_product.product_price/100}")
+    
+    # Find the least expensive product
     least_expensive_product = session.query(Product).order_by(asc(Product.product_price)).first()
     print(f"The least expensive product is: {least_expensive_product.product_name} - ${least_expensive_product.product_price/100}")
+    
+    # Find the brand with the most products
     brand_most_products = session.query(Brand.brand_name, func.count(Product.product_id)).join(Product).group_by(Brand.brand_id).order_by(func.count(Product.product_id).desc()).first()
     print(f"The brand with the most products is: {brand_most_products[0]} - {brand_most_products[1]} products")
+    
+    # Find the product with the most quantity in inventory
     most_quantity_product = session.query(Product).order_by(desc(Product.product_quantity)).first()
     print(f"The product with the most quantity in the inventory is: {most_quantity_product.product_name} - {most_quantity_product.product_quantity}\n")
 
 
 def menu():
+    """
+    Displays a menu for interacting with the database and performs corresponding actions based on user input.
+
+    Menu options:
+    - V: View product details, with options to edit or delete a product
+    - N: Add a new product
+    - A: View analysis of products and brands
+    - B: Backup database to CSV
+    - X: Exit the program
+
+    :return: None
+    """
     check_for_database()
     print("Welcome")
+    
     while True:
         user_input = input("\nV: View product details \nN:Add New Product \nA:View Analysis \nB:Backup Database \nX:Exit \n:").lower()    
+        
         if user_input == "v":
             change_product = get_product_by_id()
+            
             while True:
                 user_decision = input("E: Edit Product \nD: Delete Product: \nX: Exit \n:").lower()
+                
                 if user_decision == "e":
                     new_product = user_entered_product()
                     add_product(new_product) 
+                
                 elif user_decision == "d":
                     delete_product(change_product)
                     print("\nProduct Deleted\n")
                     break
+                
                 elif user_decision == "x":
                     break
+                
                 else:
                     print("Please enter y or n")       
+        
         elif user_input == "n":
             new_product = user_entered_product()
             add_product(new_product) 
+        
         elif user_input == "a":
             analysis()
+        
         elif user_input == "b":
             backup_products_to_csv()
+        
         elif user_input == "x":
             print("Exit Program")
             break
+        
         else:
             print("\nPlease enter a valid menu option\n")
 
