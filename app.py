@@ -5,12 +5,24 @@ import csv
 
 
 def check_for_database():
+    """
+    Checks if the database is empty by counting the number of records in the Brand and Product tables.
+    If both tables are empty, it triggers functions to import data from CSV files (import_brands_csv, import_inventory_csv).
+
+    :return: None
+    """
     if session.query(Brand).count() == 0 and session.query(Product).count() == 0:
         import_brands_csv()
         import_inventory_csv()
 
 
 def import_brands_csv():
+    """
+    Reads data from a CSV file named 'brands.csv' and imports brand names into the Brands table in the database.
+    Assumes that the CSV file has a header row.
+    
+    :return: None
+    """
     with open('brands.csv') as csvfile:
         data=csv.reader(csvfile)
         next(data)
@@ -22,6 +34,13 @@ def import_brands_csv():
     
     
 def import_inventory_csv():
+    """
+    Reads data from a CSV file named 'inventory.csv' and imports inventory information into the Products table in the database.
+    Converts product price to cents, parses date strings, and associates products with existing brands in the database.
+    Assumes that the CSV file has a header row containing columns for product name, price, quantity, date updated, and brand name.
+
+    :return: None
+    """
     with open('inventory.csv') as csvfile:
         data=csv.reader(csvfile)
         next(data)
