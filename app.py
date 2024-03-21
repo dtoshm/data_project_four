@@ -170,17 +170,22 @@ def analysis():
 
 def menu():
     check_for_database()
-    print("Welcome\n")
+    print("Welcome")
     while True:
-        user_input = input("V: View product details \nN:Add New Product \nA:View Analysis \nB:Backup Database \nE:Exit \n:").lower()
+        user_input = input("\nV: View product details \nN:Add New Product \nA:View Analysis \nB:Backup Database \nX:Exit \n:").lower()
         if user_input == "v":
             get_product_by_id()
-            change_product = input("Would you like to edit the product? y/n \n:").lower()
-            if change_product == "y":
-                new_product = user_entered_product()
-                add_product(new_product) 
-            else:
-                print("Please enter y or n")
+            while True:
+                change_product = input("E: Edit Product \nD: Delete Product: \nX: Exit \n:").lower()
+                if change_product == "e":
+                    new_product = user_entered_product()
+                    add_product(new_product) 
+                elif change_product == "d":
+                    print("delete here")
+                elif change_product == "x":
+                    break
+                else:
+                    print("Please enter y or n")
         elif user_input == "n":
             new_product = user_entered_product()
             add_product(new_product) 
@@ -188,7 +193,7 @@ def menu():
             analysis()
         elif user_input == "b":
             backup_products_to_csv()
-        elif user_input == "e":
+        elif user_input == "x":
             print("Exit Program")
             break
         else:
