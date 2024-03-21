@@ -157,35 +157,31 @@ def create_product():
     product_name = input("\nproduct_name: ")
      
     # Validate and clean quantity input
-    quantity_error = True
-    while quantity_error:
+    while True:
         quantity = input("product_quantity: ")
         quantity = clean_quantity(quantity)
         if type(quantity) == int:
-            quantity_error = False
+            break
     
     # Validate and clean price input
-    price_error = True
-    while price_error:
+    while True:
         price = input("product_price: ")
         price = clean_price(price)
         if type(price) == int:
-            price_error = False
+            break
     
     # Validate and clean date input
-    date_error = True
-    while date_error:
+    while True:
         date = input("product-updated (ex 04/08/2021): ")
         date = clean_date(date)
         if type(date) == datetime.date:
-            date_error = False
+            break
     
     # Validate brand id input
-    brand_error = True
-    while brand_error:
+    while True:
         brand_id = input("brand_id: ")
         if brand_id.isdigit():
-            brand_error = False
+            break
         else:
             print("\nPlease enter a valid id.\n")
     

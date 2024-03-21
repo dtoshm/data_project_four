@@ -26,7 +26,7 @@ Console Interface: Command-line interface for user interaction.
 
 Installation
 
-Clone the repository: git clone "url here"
+Clone the repository: git clone "https://github.com/dtoshm/data_project_four"
 Navigate to the project directory
 Install dependencies: pip install -r requirements.txt
 Run the application: python main.py
