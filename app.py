@@ -215,9 +215,18 @@ def add_product(new_product):
 
 
 def delete_product(product_id):
+    """
+    Deletes a product from the database based on its product_id.
+
+    :param product_id: Integer representing the unique identifier of the product to be deleted.
+    :return: None
+    """
     the_product = session.query(Product).filter(Product.product_id==product_id).first()
-    session.delete(the_product)
-    session.commit()
+    if the_product:
+        session.delete(the_product)
+        session.commit()
+    else:
+        print(f"Product with ID {product_id} not found in the database.")
 
 
 def get_product_by_id():
