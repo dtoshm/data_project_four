@@ -59,7 +59,7 @@ def backup_products_to_csv():
                                  str(f'${product.product_price / 100}'), 
                                  str(product.product_quantity), 
                                  formatted_date,
-                                 product.brand_id
+                                 product.brand.brand_name
                                 ])
     print(f"\nData Exported To: {csv_file_path}")
 
@@ -141,19 +141,27 @@ def add_product(new_product):
         session.commit()
 
 
+def delete_product(product_id):
+    the_product = session.query(Product).filter(Product.product_id==product_id).first()
+    session.delete(the_product)
+    session.commit()
+
+
 def get_product_by_id():
     while True:
         user_product_id = input("\nEnter a Product ID \n:")
         product = session.query(Product).filter(Product.product_id==user_product_id).first()
         if product == None:
-            print("The product id you have entered has no matching id in the database. Please try again. \n:")
+            print("\nThe product id you entered has no matching id in the database. Please try again.")
         else:
             print(f'''\nProduct ID: {product.product_id}
                   \rProduct Name: {product.product_name}
+                  \rProduct Price: ${product.product_price/100}
                   \rProduct Quantity: {product.product_quantity}
-                  \rProduct Price: {product.product_price}
                   \rProduct Updated: {product.product_updated}
+                  \rBrand ID: {product.brand_id}
                   \rBrand: {product.brand.brand_name}\n''')
+            
             break
     return user_product_id
 
@@ -165,27 +173,31 @@ def analysis():
     least_expensive_product = session.query(Product).order_by(asc(Product.product_price)).first()
     print(f"The least expensive product is: {least_expensive_product.product_name} - ${least_expensive_product.product_price/100}")
     brand_most_products = session.query(Brand.brand_name, func.count(Product.product_id)).join(Product).group_by(Brand.brand_id).order_by(func.count(Product.product_id).desc()).first()
-    print(f"The brand with the most products is: {brand_most_products[0]} - {brand_most_products[1]} products\n")
+    print(f"The brand with the most products is: {brand_most_products[0]} - {brand_most_products[1]} products")
+    most_quantity_product = session.query(Product).order_by(desc(Product.product_quantity)).first()
+    print(f"The product with the most quantity in the inventory is: {most_quantity_product.product_name} - {most_quantity_product.product_quantity}\n")
 
 
 def menu():
     check_for_database()
     print("Welcome")
     while True:
-        user_input = input("\nV: View product details \nN:Add New Product \nA:View Analysis \nB:Backup Database \nX:Exit \n:").lower()
+        user_input = input("\nV: View product details \nN:Add New Product \nA:View Analysis \nB:Backup Database \nX:Exit \n:").lower()    
         if user_input == "v":
-            get_product_by_id()
+            change_product = get_product_by_id()
             while True:
-                change_product = input("E: Edit Product \nD: Delete Product: \nX: Exit \n:").lower()
-                if change_product == "e":
+                user_decision = input("E: Edit Product \nD: Delete Product: \nX: Exit \n:").lower()
+                if user_decision == "e":
                     new_product = user_entered_product()
                     add_product(new_product) 
-                elif change_product == "d":
-                    print("delete here")
-                elif change_product == "x":
+                elif user_decision == "d":
+                    delete_product(change_product)
+                    print("\nProduct Deleted\n")
+                    break
+                elif user_decision == "x":
                     break
                 else:
-                    print("Please enter y or n")
+                    print("Please enter y or n")       
         elif user_input == "n":
             new_product = user_entered_product()
             add_product(new_product) 
@@ -199,7 +211,7 @@ def menu():
         else:
             print("\nPlease enter a valid menu option\n")
 
-    
+
 if __name__ == '__main__':
     Base.metadata.create_all(engine)
     menu()
