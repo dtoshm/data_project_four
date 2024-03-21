@@ -40,9 +40,8 @@ def import_inventory_csv():
                                          product_quantity=product_quantity, product_updated=date_updated,
                                          brand_id = brand_query)
             
-            session.add(new_product)
-            session.commit()
-      
+            add_product(new_product)
+
 
 def backup_products_to_csv():
     products = session.query(Product).all()
@@ -137,11 +136,9 @@ def add_product(new_product):
             existing_product.product_quantity = new_product.product_quantity
             existing_product.product_updated = new_product.product_updated
             session.commit()
-            print("\nProduct Updated\n")
     else:
         session.add(new_product)
         session.commit()
-        print("\nProduct Added\n")
 
 
 def get_product_by_id():
