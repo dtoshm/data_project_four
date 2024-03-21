@@ -143,8 +143,8 @@ def add_product(new_product):
 
 def get_product_by_id():
     while True:
-        user_selected_product = input("\nEnter a Product ID \n:")
-        product = session.query(Product).filter(Product.product_id==user_selected_product).first()
+        user_product_id = input("\nEnter a Product ID \n:")
+        product = session.query(Product).filter(Product.product_id==user_product_id).first()
         if product == None:
             print("The product id you have entered has no matching id in the database. Please try again. \n:")
         else:
@@ -153,8 +153,9 @@ def get_product_by_id():
                   \rProduct Quantity: {product.product_quantity}
                   \rProduct Price: {product.product_price}
                   \rProduct Updated: {product.product_updated}
-                  \rBrand ID: {product.brand_id}\n''')
+                  \rBrand: {product.brand.brand_name}\n''')
             break
+    return user_product_id
 
 
 def analysis():
@@ -174,6 +175,12 @@ def menu():
         user_input = input("V: View product details \nN:Add New Product \nA:View Analysis \nB:Backup Database \nE:Exit \n:").lower()
         if user_input == "v":
             get_product_by_id()
+            change_product = input("Would you like to edit the product? y/n \n:").lower()
+            if change_product == "y":
+                new_product = user_entered_product()
+                add_product(new_product) 
+            else:
+                print("Please enter y or n")
         elif user_input == "n":
             new_product = user_entered_product()
             add_product(new_product) 
