@@ -35,6 +35,6 @@ class Product(Base):
                    \rproduct_name: {self.product_name},
                    \rproduct_quantity: {self.product_quantity},
                    \rproduct_price: {self.product_price},
-                   \rproduct_updated: {self.product_updated},
+                   \rproduct_updated: {str(self.product_updated).replace('-', '/')},
                    \rbrand_id: {self.brand_id},
-                   \rbrand: {self.brand}'''
+                   \rbrand: {self.brand.brand_name}'''
