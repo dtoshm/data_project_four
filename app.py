@@ -84,12 +84,13 @@ def backup_products_to_csv():
         csv_writer = csv.writer(csvfile)
         csv_writer.writerow(['product_name', 'product_price', 'product_quantity', 'date_updated', 'brand_name'])
         for product in products:
-            
+            # Formatting
             date_str = str(product.product_updated).split('-')
             formatted_date = f'{date_str[1]}/{date_str[2]}/{date_str[0]}'
-            
+            formatted_price = '{:.2f}'.format(product.product_price / 100)
+            # Writing
             csv_writer.writerow([product.product_name, 
-                                 str(f'${product.product_price / 100}'), 
+                                 f'${formatted_price}', 
                                  str(product.product_quantity), 
                                  formatted_date,
                                  product.brand.brand_name
