@@ -1,5 +1,5 @@
 # data_project_four
-Inventory Management Console Application
+Grocery Store Inventory System
 
 
 Overview
@@ -36,10 +36,3 @@ Usage
 
 Upon running the application, follow the on-screen instructions to perform various actions.
 Use menu options to import CSV data, manage inventory records, generate reports, and create backups.
-
-
-Project Structure
-
-app.py: Entry point of the application.
-models.py: Contains database setup and SQLAlchemy ORM models.
-requirements.txt: List of Python dependencies.
