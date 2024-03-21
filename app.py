@@ -149,7 +149,7 @@ def clean_date(date_str):
         return return_date
 
 
-def user_entered_product():
+def create_product():
     """
     Guides the user to input product details and creates a new Product object.
 
@@ -229,7 +229,7 @@ def delete_product(product_id):
         print(f"Product with ID {product_id} not found in the database.")
 
 
-def get_product_by_id():
+def search_products():
     """
     Retrieves and displays product details based on a user-provided Product ID.
 
@@ -272,15 +272,12 @@ def analysis():
     # Find the most expensive product
     most_expensive_product = session.query(Product).order_by(desc(Product.product_price)).first()
     print(f"The most expensive product is: {most_expensive_product.product_name} - ${most_expensive_product.product_price/100}")
-    
     # Find the least expensive product
     least_expensive_product = session.query(Product).order_by(asc(Product.product_price)).first()
     print(f"The least expensive product is: {least_expensive_product.product_name} - ${least_expensive_product.product_price/100}")
-    
     # Find the brand with the most products
     brand_most_products = session.query(Brand.brand_name, func.count(Product.product_id)).join(Product).group_by(Brand.brand_id).order_by(func.count(Product.product_id).desc()).first()
     print(f"The brand with the most products is: {brand_most_products[0]} - {brand_most_products[1]} products")
-    
     # Find the product with the most quantity in inventory
     most_quantity_product = session.query(Product).order_by(desc(Product.product_quantity)).first()
     print(f"The product with the most quantity in the inventory is: {most_quantity_product.product_name} - {most_quantity_product.product_quantity}")
@@ -304,42 +301,33 @@ def menu():
     
     while True:
         user_input = input("V: View product details \nN:Add New Product \nA:View Analysis \nB:Backup Database \nX:Exit \n:").lower()    
-        
+        # menu
         if user_input == "v":
-            change_product = get_product_by_id()
-            
+            selected_product = search_products()
             while True:
                 user_decision = input("E: Edit Product \nD: Delete Product: \nX: Exit \n:").lower()
-                
+                # submenu
                 if user_decision == "e":
-                    new_product = user_entered_product()
+                    new_product = create_product()
                     add_product(new_product) 
-                
                 elif user_decision == "d":
-                    delete_product(change_product)
+                    delete_product(selected_product)
                     print("Product Deleted")
                     break
-                
                 elif user_decision == "x":
                     break
-                
                 else:
                     print("Please enter y or n")       
-        
         elif user_input == "n":
-            new_product = user_entered_product()
+            new_product = create_product()
             add_product(new_product) 
-        
         elif user_input == "a":
             analysis()
-        
         elif user_input == "b":
             backup_products_to_csv()
-        
         elif user_input == "x":
             print("Exit Program")
             break
-        
         else:
             print("Please enter a valid menu option")
 
