@@ -36,4 +36,5 @@ class Product(Base):
                    \rproduct_quantity: {self.product_quantity},
                    \rproduct_price: {self.product_price},
                    \rproduct_updated: {self.product_updated},
-                   \rbrand_id: {self.brand_id}'''
+                   \rbrand_id: {self.brand_id},
+                   \rbrand: {self.brand}'''

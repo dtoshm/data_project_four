@@ -79,7 +79,7 @@ def backup_products_to_csv():
         print("No products to export.")
         return
     
-    csv_file_path = 'inventory_backup.csv'
+    csv_file_path = 'backup.csv'
     with open(csv_file_path, 'w', newline='') as csvfile:
         csv_writer = csv.writer(csvfile)
         csv_writer.writerow(['product_name', 'product_price', 'product_quantity', 'date_updated', 'brand_name'])
@@ -240,17 +240,10 @@ def search_products():
     while True:
         user_product_id = input("Enter a Product ID:")
         product = session.query(Product).filter(Product.product_id==user_product_id).first()
-        
         if product == None:
             print("The product id you entered has no matching id in the database. Please try again.")
         else:
-            print(f'''Product ID: {product.product_id}
-                  \rProduct Name: {product.product_name}
-                  \rProduct Price: ${product.product_price/100}
-                  \rProduct Quantity: {product.product_quantity}
-                  \rProduct Updated: {product.product_updated}
-                  \rBrand ID: {product.brand_id}
-                  \rBrand: {product.brand.brand_name}''')
+            print(product.__repr__)
             break
     return user_product_id
 
@@ -268,17 +261,16 @@ def analysis():
     :return: None
     """
     print("Analysis")
-    
-    # Find the most expensive product
+    # most expensive product
     most_expensive_product = session.query(Product).order_by(desc(Product.product_price)).first()
     print(f"The most expensive product is: {most_expensive_product.product_name} - ${most_expensive_product.product_price/100}")
-    # Find the least expensive product
+    # least expensive product
     least_expensive_product = session.query(Product).order_by(asc(Product.product_price)).first()
     print(f"The least expensive product is: {least_expensive_product.product_name} - ${least_expensive_product.product_price/100}")
-    # Find the brand with the most products
+    # brand with the most products
     brand_most_products = session.query(Brand.brand_name, func.count(Product.product_id)).join(Product).group_by(Brand.brand_id).order_by(func.count(Product.product_id).desc()).first()
     print(f"The brand with the most products is: {brand_most_products[0]} - {brand_most_products[1]} products")
-    # Find the product with the most quantity in inventory
+    # product with the most quantity in inventory
     most_quantity_product = session.query(Product).order_by(desc(Product.product_quantity)).first()
     print(f"The product with the most quantity in the inventory is: {most_quantity_product.product_name} - {most_quantity_product.product_quantity}")
 
