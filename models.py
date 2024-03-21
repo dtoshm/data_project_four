@@ -1,9 +1,9 @@
 from sqlalchemy import (create_engine, Column, Integer, 
                         String, Date, ForeignKey, desc, asc, func)
-from sqlalchemy.orm import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship
+from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 
 
+# Database Configuration
 engine = create_engine('sqlite:///inventory.db', echo=False)
 Base = declarative_base()
 Session = sessionmaker(engine)
@@ -30,7 +30,6 @@ class Product(Base):
     brand_id = Column(Integer, ForeignKey('Brands.brand_id'))
     brand = relationship("Brand", back_populates="products")
     
-
     def __repr__(self):
         return f'''product_id: {self.product_id},
                    \rproduct_name: {self.product_name},
