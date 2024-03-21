@@ -94,7 +94,7 @@ def backup_products_to_csv():
                                  formatted_date,
                                  product.brand.brand_name
                                 ])
-    print(f"\nData Exported To: {csv_file_path}")
+    print(f"Data Exported To: {csv_file_path}")
 
 
 def clean_price(price_str):
@@ -107,7 +107,7 @@ def clean_price(price_str):
     try:
         cleaned_price = float(price_str.replace('$', ''))
     except ValueError:
-        print('\n****** PRICE ERROR ******')
+        print('****** PRICE ERROR ******')
         print('Please enter a price (ex 5.99)')
     else:
         return int(cleaned_price * 100)
@@ -123,7 +123,7 @@ def clean_quantity(quantity_str):
     try:
         cleaned_quantity = int(quantity_str)
     except ValueError:
-        print('\n****** QUANTITY ERROR ******')
+        print('****** QUANTITY ERROR ******')
         print('Please enter a quantity (ex 5)')
     else:
         return int(cleaned_quantity)
@@ -143,7 +143,7 @@ def clean_date(date_str):
         year = int(split_date[2])
         return_date = datetime.date(year, month, day)
     except (ValueError, IndexError):
-        print('\n****** DATE ERROR ******')
+        print('****** DATE ERROR ******')
         print('Please enter a date (ex 04/08/2021)')
     else: 
         return return_date
@@ -155,7 +155,7 @@ def user_entered_product():
 
     :return: New Product object based on user input.
     """
-    product_name = input("\nProduct Name: ")
+    product_name = input("Product Name: ")
     
     # Validate and clean price input
     price_error = True
@@ -238,19 +238,19 @@ def get_product_by_id():
     :return: String representing the user-entered Product ID.
     """
     while True:
-        user_product_id = input("\nEnter a Product ID \n:")
+        user_product_id = input("Enter a Product ID:")
         product = session.query(Product).filter(Product.product_id==user_product_id).first()
         
         if product == None:
-            print("\nThe product id you entered has no matching id in the database. Please try again.")
+            print("The product id you entered has no matching id in the database. Please try again.")
         else:
-            print(f'''\nProduct ID: {product.product_id}
+            print(f'''Product ID: {product.product_id}
                   \rProduct Name: {product.product_name}
                   \rProduct Price: ${product.product_price/100}
                   \rProduct Quantity: {product.product_quantity}
                   \rProduct Updated: {product.product_updated}
                   \rBrand ID: {product.brand_id}
-                  \rBrand: {product.brand.brand_name}\n''')
+                  \rBrand: {product.brand.brand_name}''')
             break
     return user_product_id
 
@@ -267,7 +267,7 @@ def analysis():
 
     :return: None
     """
-    print("\nAnalysis")
+    print("Analysis")
     
     # Find the most expensive product
     most_expensive_product = session.query(Product).order_by(desc(Product.product_price)).first()
@@ -283,7 +283,7 @@ def analysis():
     
     # Find the product with the most quantity in inventory
     most_quantity_product = session.query(Product).order_by(desc(Product.product_quantity)).first()
-    print(f"The product with the most quantity in the inventory is: {most_quantity_product.product_name} - {most_quantity_product.product_quantity}\n")
+    print(f"The product with the most quantity in the inventory is: {most_quantity_product.product_name} - {most_quantity_product.product_quantity}")
 
 
 def menu():
@@ -300,10 +300,10 @@ def menu():
     :return: None
     """
     check_for_database()
-    print("Welcome")
+    print("\nWelcome\n")
     
     while True:
-        user_input = input("\nV: View product details \nN:Add New Product \nA:View Analysis \nB:Backup Database \nX:Exit \n:").lower()    
+        user_input = input("V: View product details \nN:Add New Product \nA:View Analysis \nB:Backup Database \nX:Exit \n:").lower()    
         
         if user_input == "v":
             change_product = get_product_by_id()
@@ -317,7 +317,7 @@ def menu():
                 
                 elif user_decision == "d":
                     delete_product(change_product)
-                    print("\nProduct Deleted\n")
+                    print("Product Deleted")
                     break
                 
                 elif user_decision == "x":
@@ -341,7 +341,7 @@ def menu():
             break
         
         else:
-            print("\nPlease enter a valid menu option\n")
+            print("Please enter a valid menu option")
 
 
 if __name__ == '__main__':
