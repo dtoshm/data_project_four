@@ -64,7 +64,7 @@ def import_inventory_csv():
                                       brand_id = brand_query) 
                 add_product(new_product)
             else:
-                print(f"Brand {brand_query} has not been found in the database.")
+                print(f"\nBrand {brand_query} has not been found in the database.")
 
 
 def backup_products_to_csv():
@@ -76,7 +76,7 @@ def backup_products_to_csv():
     """
     products = session.query(Product).all()
     if not products:
-        print("No products to export.")
+        print("\nNo products to export.")
         return
     
     csv_file_path = 'backup.csv'
@@ -109,8 +109,7 @@ def clean_price(price_str):
     try:
         cleaned_price = float(price_str.replace('$', ''))
     except ValueError:
-        print('****** PRICE ERROR ******')
-        print('Please enter a price (ex 5.99)')
+        print('\nPlease enter a price (ex 5.99)\n')
     else:
         return int(cleaned_price * 100)
 
@@ -125,8 +124,7 @@ def clean_quantity(quantity_str):
     try:
         cleaned_quantity = int(quantity_str)
     except ValueError:
-        print('****** QUANTITY ERROR ******')
-        print('Please enter a quantity (ex 5)')
+        print('\nPlease enter a quantity (ex 5)\n')
     else:
         return int(cleaned_quantity)
 
@@ -145,8 +143,7 @@ def clean_date(date_str):
         year = int(split_date[2])
         return_date = datetime.date(year, month, day)
     except (ValueError, IndexError):
-        print('****** DATE ERROR ******')
-        print('Please enter a date (ex 04/08/2021)')
+        print('\nPlease enter a date (ex 04/08/2021)\n')
     else: 
         return return_date
 
@@ -183,7 +180,14 @@ def create_product():
         if type(date) == datetime.date:
             date_error = False
     
-    brand_id = input("brand_id: ")
+    # Validate brand id input
+    brand_error = True
+    while brand_error:
+        brand_id = input("brand_id: ")
+        if brand_id.isdigit():
+            brand_error = False
+        else:
+            print("\nPlease enter a valid id.\n")
     
     new_product = Product(product_name=product_name,
                         product_price=price,
@@ -230,7 +234,7 @@ def delete_product(product_id):
         session.delete(the_product)
         session.commit()
     else:
-        print(f"Product with ID {product_id} not found in the database.")
+        print(f"\nProduct with ID {product_id} not found in the database.")
 
 
 def search_products():
@@ -245,7 +249,7 @@ def search_products():
         user_product_id = input("\nEnter a Product ID: ")
         product = session.query(Product).filter(Product.product_id==user_product_id).first()
         if product == None:
-            print("The product id you entered has no matching id in the database. Please try again.")
+            print("\nThere is no matching id in the database. Please try again.")
         else:
             print(f"\n{product}")
             break
@@ -302,7 +306,7 @@ def menu():
     print("\nWelcome")
     
     while True:
-        user_input = input("\nV: View Product \nN: Add New Product \nA: View Analysis \nB: Backup Database \nX: Exit \n:").lower()    
+        user_input = input("\nV: View Product \nN: Add Product \nA: Display Analysis \nB: Backup Database \nX: Exit \n:").lower()    
         # menu
         if user_input == "v":
             selected_product = search_products()
@@ -311,7 +315,7 @@ def menu():
                 # submenu
                 if user_decision == "e":
                     new_product = create_product()
-                    edit_status = add_product(new_product) 
+                    edit_status = add_product(new_product)
                     print(f"\nProduct {edit_status}.")
                 elif user_decision == "d":
                     delete_product(selected_product)
@@ -320,7 +324,7 @@ def menu():
                 elif user_decision == "x":
                     break
                 else:
-                    print("Please enter y or n")       
+                    print("\nPlease enter a valid menu option.")
         elif user_input == "n":
             new_product = create_product()
             new_status = add_product(new_product) 
@@ -333,7 +337,7 @@ def menu():
             print("\nExiting Program")
             break
         else:
-            print("\nPlease enter a valid menu option")
+            print("\nPlease enter a valid menu option.")
 
 
 if __name__ == '__main__':
