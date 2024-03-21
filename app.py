@@ -50,13 +50,13 @@ def import_inventory_csv():
             product_quantity = int(row[2])
             date_updated = clean_date(row[3])
             brand_name = row[4]
-            
+            # Format price
             cleaned_product_price = float(product_price.replace('$', ''))
             price_in_cents = int(cleaned_product_price * 100)
-            
             # Query the database to get the brand_id
             brand_query = session.query(Brand).filter(Brand.brand_name==brand_name).first().brand_id
             if brand_query:
+                # Create product
                 new_product = Product(product_name=product_name, 
                                       product_price=price_in_cents,
                                       product_quantity=product_quantity, 
@@ -78,18 +78,18 @@ def backup_products_to_csv():
     if not products:
         print("\nNo products to export.")
         return
-    
+    # Create file
     csv_file_path = 'backup.csv'
     with open(csv_file_path, 'w', newline='') as csvfile:
         csv_writer = csv.writer(csvfile)
         csv_writer.writerow(['product_name', 'product_price', 'product_quantity', 'date_updated', 'brand_name'])
         for product in products:
-            # Formatting
+            # Format
             date_str = str(product.product_updated).split('-')
             formatted_date = f'{date_str[1]}/{date_str[2]}/{date_str[0]}'
             formatted_price = '{:.2f}'.format(product.product_price / 100)
             
-            # Writing
+            # Write
             csv_writer.writerow([product.product_name, 
                                  f'${formatted_price}', 
                                  str(product.product_quantity), 
@@ -108,7 +108,7 @@ def clean_price(price_str):
     """
     try:
         cleaned_price = float(price_str.replace('$', ''))
-    except ValueError:
+    except (ValueError, TypeError):
         print('\nPlease enter a price (ex 5.99)\n')
     else:
         return int(cleaned_price * 100)
@@ -123,7 +123,7 @@ def clean_quantity(quantity_str):
     """
     try:
         cleaned_quantity = int(quantity_str)
-    except ValueError:
+    except (ValueError, TypeError):
         print('\nPlease enter a quantity (ex 5)\n')
     else:
         return int(cleaned_quantity)
@@ -155,36 +155,36 @@ def create_product():
     :return: New Product object based on user input.
     """
     product_name = input("\nproduct_name: ")
-     
     # Validate and clean quantity input
     while True:
         quantity = input("product_quantity: ")
         quantity = clean_quantity(quantity)
         if type(quantity) == int:
             break
-    
     # Validate and clean price input
     while True:
         price = input("product_price: ")
         price = clean_price(price)
         if type(price) == int:
             break
-    
     # Validate and clean date input
     while True:
         date = input("product-updated (ex 04/08/2021): ")
         date = clean_date(date)
         if type(date) == datetime.date:
             break
-    
     # Validate brand id input
     while True:
         brand_id = input("brand_id: ")
         if brand_id.isdigit():
-            break
+            brand_exists = session.query(Brand).filter_by(brand_id=brand_id).first()
+            if brand_exists:
+                break
+            else:
+                print("\nPlease enter a valid id within the database.\n")
         else:
-            print("\nPlease enter a valid id.\n")
-    
+            print("\nPlease enter a valid id. (Ex 5)\n")
+    # Create the product
     new_product = Product(product_name=product_name,
                         product_price=price,
                         product_quantity=quantity,
@@ -200,8 +200,8 @@ def add_product(new_product):
     :param new_product: Product object representing the new or updated product to be added or updated.
     :return: str indicating if the product was added or updated ('Added' or 'Updated')
     """
+    # Check for existing product
     existing_product = session.query(Product).filter(Product.product_name==new_product.product_name).first()
-    
     if existing_product:
         if existing_product.product_updated < new_product.product_updated:
             # Update existing product with newer details
@@ -299,41 +299,55 @@ def menu():
     :return: None
     """
     check_for_database()
-    print("\nWelcome")
-    
-    while True:
-        user_input = input("\nV: View Product \nN: Add Product \nA: Display Analysis \nB: Backup Database \nX: Exit \n:").lower()    
-        # menu
-        if user_input == "v":
-            selected_product = search_products()
-            while True:
-                user_decision = input("\nE: Edit Product \nD: Delete Product \nX: Exit \n:").lower()
-                # submenu
-                if user_decision == "e":
-                    new_product = create_product()
-                    edit_status = add_product(new_product)
-                    print(f"\nProduct {edit_status}.")
-                elif user_decision == "d":
-                    delete_product(selected_product)
-                    print("\nProduct Deleted")
-                    break
-                elif user_decision == "x":
-                    break
-                else:
-                    print("\nPlease enter a valid menu option.")
-        elif user_input == "n":
-            new_product = create_product()
-            new_status = add_product(new_product) 
-            print(f"\nProduct {new_status}.")
-        elif user_input == "a":
-            analysis()
-        elif user_input == "b":
-            backup_products_to_csv()
-        elif user_input == "x":
-            print("\nExiting Program")
-            break
-        else:
-            print("\nPlease enter a valid menu option.")
+    print("\nGrocery Store Inventory System")
+    # Precaution
+    try:
+        while True:
+            user_input = input("\nV: View Product \nN: Add Product \nA: Display Analysis \nB: Backup Database \nX: Exit \n:").lower()    
+            # Menu
+            if user_input == "v":
+                # View Product
+                selected_product = search_products()
+                while True:
+                    user_decision = input("\nE: Edit Product \nD: Delete Product \nX: Exit \n:").lower()
+                    # Submenu for viewing product
+                    if user_decision == "e":
+                        # Edit
+                        new_product = create_product()
+                        edit_status = add_product(new_product)
+                        print(f"\nProduct {edit_status}.")
+                    elif user_decision == "d":
+                        # Delete
+                        delete_product(selected_product)
+                        print("\nProduct Deleted")
+                        break
+                    elif user_decision == "x":
+                        # Exit
+                        break
+                    else:
+                        print("\nPlease enter a valid menu option.")
+            elif user_input == "n":
+                # Add Product
+                new_product = create_product()
+                new_status = add_product(new_product) 
+                print(f"\nProduct {new_status}.")
+            elif user_input == "a":
+                # Display Analysis
+                analysis()
+            elif user_input == "b":
+                # Backup Database
+                backup_products_to_csv()
+            elif user_input == "x":
+                # Exit
+                print("\nExiting Program")
+                break
+            else:
+                print("\nPlease enter a valid menu option.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+    finally:
+        # Close the database session
+        session.close()
 
 
 if __name__ == '__main__':
