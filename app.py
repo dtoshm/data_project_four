@@ -68,17 +68,26 @@ def import_inventory_csv():
 
 
 def backup_products_to_csv():
+    """
+    Backs up product data from the database to a CSV file named 'inventory_backup.csv'.
+    Exports product name, price, quantity, date updated, and brand name.
+
+    :return: None
+    """
     products = session.query(Product).all()
     if not products:
         print("No products to export.")
         return
+    
     csv_file_path = 'inventory_backup.csv'
     with open(csv_file_path, 'w', newline='') as csvfile:
         csv_writer = csv.writer(csvfile)
         csv_writer.writerow(['product_name', 'product_price', 'product_quantity', 'date_updated', 'brand_name'])
         for product in products:
+            
             date_str = str(product.product_updated).split('-')
             formatted_date = f'{date_str[1]}/{date_str[2]}/{date_str[0]}'
+            
             csv_writer.writerow([product.product_name, 
                                  str(f'${product.product_price / 100}'), 
                                  str(product.product_quantity), 
@@ -89,6 +98,12 @@ def backup_products_to_csv():
 
 
 def clean_price(price_str):
+    """
+    Cleans and converts a price string into an integer representing cents.
+
+    :param price_str: String representing a price with or without a dollar sign (e.g., "$5.99" or "5.99").
+    :return: Integer representing the price in cents, or None if price cleaning fails.
+    """
     try:
         cleaned_price = float(price_str.replace('$', ''))
     except ValueError:
@@ -99,6 +114,12 @@ def clean_price(price_str):
 
 
 def clean_quantity(quantity_str):
+    """
+    Cleans and converts a quantity string into an integer.
+
+    :param quantity_str: String representing a quantity (e.g., "5").
+    :return: Integer representing the quantity, or None if cleaning fails.
+    """
     try:
         cleaned_quantity = int(quantity_str)
     except ValueError:
@@ -109,6 +130,12 @@ def clean_quantity(quantity_str):
 
 
 def clean_date(date_str):
+    """
+    Cleans and converts a date string in 'MM/DD/YYYY' format to a datetime.date object.
+
+    :param date_str: String representing a date in 'MM/DD/YYYY' format (e.g., "04/08/2021").
+    :return: datetime.date object representing the cleaned date, or None if cleaning fails.
+    """
     split_date = date_str.split('/')
     try:
         month = int(split_date[0])
@@ -123,26 +150,39 @@ def clean_date(date_str):
 
 
 def user_entered_product():
+    """
+    Guides the user to input product details and creates a new Product object.
+
+    :return: New Product object based on user input.
+    """
     product_name = input("\nProduct Name: ")
+    
+    # Validate and clean price input
     price_error = True
     while price_error:
         price = input("Product Price: ")
         price = clean_price(price)
         if type(price) == int:
             price_error = False
+     
+    # Validate and clean quantity input
     quantity_error = True
     while quantity_error:
         quantity = input("Product Quantity: ")
         quantity = clean_quantity(quantity)
         if type(quantity) == int:
             quantity_error = False
+    
+    # Validate and clean date input
     date_error = True
     while date_error:
         date = input("Product Date Updated (ex 04/08/2021): ")
         date = clean_date(date)
         if type(date) == datetime.date:
             date_error = False
+    
     brand_id = input("Brand ID:")
+    
     new_product = Product(product_name=product_name,
                         product_price=price,
                         product_quantity=quantity,
@@ -152,15 +192,24 @@ def user_entered_product():
 
 
 def add_product(new_product):
+    """
+    Adds a new product to the database or updates an existing product if a newer version is provided.
+
+    :param new_product: Product object representing the new or updated product to be added or updated.
+    :return: None
+    """
     existing_product = session.query(Product).filter(Product.product_name==new_product.product_name).first()
+    
     if existing_product:
         if existing_product.product_updated < new_product.product_updated:
+            # Update existing product with newer details
             existing_product.product_name = new_product.product_name
             existing_product.product_price = new_product.product_price
             existing_product.product_quantity = new_product.product_quantity
             existing_product.product_updated = new_product.product_updated
             session.commit()
     else:
+        # Add new product to the database
         session.add(new_product)
         session.commit()
 
